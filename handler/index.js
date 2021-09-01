@@ -6,6 +6,11 @@ const mongoose = require("mongoose");
 
 const globPromise = promisify(glob);
 
+const {readdirSync} = require('fs');
+const ascii = require('ascii-table')
+let table = new ascii("Commands");
+table.setHeading('Command', ' Tinh trang');
+
 /**
  * @param {Client} client
  */
@@ -13,16 +18,15 @@ module.exports = async(client) => {
     /// TABLE \\\
     readdirSync('./commands/').forEach(dir => {
         const commands = readdirSync(`./commands/${dir}/`).filter(file => file.endsWith('.js'));
-        for (let file of commands) {
+        for(let file of commands){
             let pull = require(`../commands/${dir}/${file}`);
-            if (pull.name) {
+            if(pull.name){
                 client.commands.set(pull.name, pull);
-                table.addRow(file, '✅')
+                table.addRow(file,'✅')
             } else {
                 table.addRow(file, '❌ -> Missing a help.name, or help.name is not a string.')
                 continue;
-            }
-            if (pull.aliases && Array.isArray(pull.aliases)) pull.aliases.forEach(alias => client.aliases.set(alias, pull.name))
+            }if(pull.aliases && Array.isArray(pull.aliases)) pull.aliases.forEach(alias => client.aliases.set(alias, pull.name))
         }
     });
     console.log(table.toString());
@@ -59,13 +63,13 @@ module.exports = async(client) => {
         arrayOfSlashCommands.push(file);
     });
     client.on("ready", async() => {
-        // Register for a single guild
+        /* Register for a single guild
         await client.guilds.cache
             .get("replace this with your guild id")
             .commands.set(arrayOfSlashCommands);
-
+          */
         // Register for all the guilds the bot is in
-        // await client.application.commands.set(arrayOfSlashCommands);
+        await client.application.commands.set(arrayOfSlashCommands);
     });
 
     // mongoose
