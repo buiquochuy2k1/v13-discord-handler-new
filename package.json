@@ -11,7 +11,9 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "ascii-table": "^0.0.9",
         "discord.js": "^13.1.0",
+        "fs": "^0.0.1-security",
         "glob": "^7.1.7",
         "mongoose": "^6.0.1"
     }
