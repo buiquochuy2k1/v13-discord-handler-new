@@ -1,6 +1,6 @@
 const { glob } = require("glob");
 const { promisify } = require("util");
-const { Client } = require("discord.js");
+const { Client, MessageEmbed } = require("discord.js");
 const { mongooseConnectionString } = require("../config.json");
 const mongoose = require("mongoose");
 
@@ -10,6 +10,8 @@ const {readdirSync} = require('fs');
 const ascii = require('ascii-table')
 let table = new ascii("Commands");
 table.setHeading('Command', ' Tinh trang');
+
+const { ERROR_LOGS_CHANNEL } = require('../config.json')
 
 /**
  * @param {Client} client
@@ -81,4 +83,33 @@ module.exports = async(client) => {
         useUnifiedTopology: true,
         useNewUrlParser: true,
     }).then(() => console.log('Connected to mongodb'));
+
+
+    // Error Handling
+
+process.on("uncaughtException", (err) => {
+    console.log("Uncaught Exception: " + err);
+  
+    const exceptionembed = new MessageEmbed()
+    .setTitle("Uncaught Exception")
+    .setDescription(`${err}`)
+    .setColor("RED")
+    client.channels.cache.get(ERROR_LOGS_CHANNEL).send({ embeds: [exceptionembed] })
+  });
+  
+  process.on("unhandledRejection", (reason, promise) => {
+    console.log(
+      "[FATAL] Possibly Unhandled Rejection at: Promise ",
+      promise,
+      " reason: ",
+      reason.message
+    );
+  
+     const rejectionembed = new MessageEmbed()
+    .setTitle("Unhandled Promise Rejection")
+    .addField("Promise", `${promise}`)
+    .addField("Reason", `${reason.message}`)
+    .setColor("RED")
+    client.channels.cache.get(ERROR_LOGS_CHANNEL).send({ embeds: [rejectionembed] })
+  });
 };
